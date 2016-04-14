@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Timer;
 
 import javax.imageio.ImageIO;
@@ -23,6 +24,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+
+import cn.swsn.comtest.Mycom;
 
 public class MainFrame extends SuperFrame {
 
@@ -83,6 +86,7 @@ class ActionFrame extends SuperFrame implements Runnable {
 	private JTextArea jta = new JTextArea(20, 30);
 	Object[][] playerInfo = new Object[250][4];
 	String[] Names = { "序号", "端子", "名称", "状态" };
+	Mycom mc = new Mycom();
 
 	ActionFrame() {
 		time = 100;
@@ -123,18 +127,19 @@ class ActionFrame extends SuperFrame implements Runnable {
 		// TODO Auto-generated method stub
 		// new ActionFrame();
 		if (e.getSource().equals(jb1)) {
-			// new Thread(this).start();
-			for (int i = 0; i < 250; i++) {
-				/*
+			new Thread(this).start();
+			mc.openSerialPort();
+/*			for (int i = 0; i < 250; i++) {
+				
 				 * try { Thread.sleep(50); } catch (InterruptedException e1) {
 				 * // TODO Auto-generated catch block e1.printStackTrace(); }
-				 */
+				 
 				// jta.append("BAT" + i + "  --> ECU1   灯光" + i + " --> 灯光3" +
 				// "\n");
 				Object[] obj = { "1", "2", "3", "4" };
 				playerInfo[i] = obj;
 				this.repaint();
-			}
+			}*/ 
 		} else if (e.getSource().equals(jb2)) {
 			JOptionPane.showMessageDialog(this.getParent(), "保存答题信息成功！");
 		}
@@ -144,9 +149,18 @@ class ActionFrame extends SuperFrame implements Runnable {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
+		List<String> results = mc.results;
+		int i = 0;
 		while (time > 0) {
 			try {
 				jl_info.setText(time-- + "");
+				if(results.size() > 0){
+					for(int j = i; j < results.size(); j++){
+						Object[] obj = { "1", "2", "3", results.get(i) };
+						playerInfo[i] = obj;
+					}
+					i = results.size() - 1;
+				}
 				this.repaint();
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
