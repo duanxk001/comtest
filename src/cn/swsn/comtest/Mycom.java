@@ -54,14 +54,14 @@ public class Mycom implements SerialPortEventListener{
             results.add(new String(readBuffer).trim());
             System.out.println(receivedMsg.toString());  
             reciveCount++;  
-            System.out.println("  ·¢ËÍ: "+sendCount+"                                      ½ÓÊÕ: "+reciveCount);  
+            System.out.println("  å‘é€: "+sendCount+"                                      æ¥æ”¶: "+reciveCount);  
         } catch (IOException e) {  
             System.out.println(e.getMessage());  
         }  
     } 
 	}
 	
-	//´ò¿ª¶Ë¿Ú
+	//æ‰“å¼€ç«¯å£
 	public void scanPorts(){
 		portList = new ArrayList<String>();  
         Enumeration<?> en = CommPortIdentifier.getPortIdentifiers();  
@@ -77,33 +77,33 @@ public class Mycom implements SerialPortEventListener{
         }  
         if(null == portList   
                 || portList.isEmpty()) {  
-            System.out.println("Î´ÕÒµ½¿ÉÓÃµÄ´®ĞĞ¶Ë¿ÚºÅ,³ÌĞòÎŞ·¨Æô¶¯!");  
+            System.out.println("æœªæ‰¾åˆ°å¯ç”¨çš„ä¸²è¡Œç«¯å£å·,ç¨‹åºæ— æ³•å¯åŠ¨!");  
             System.exit(0);  
         }
 	}
 	
 	/*
-	 * ´ò¿ª´®¿Ú²¢¼àÌı
+	 * æ‰“å¼€ä¸²å£å¹¶ç›‘å¬
 	 */
 	public void openSerialPort() {   
-        // »ñÈ¡Òª´ò¿ªµÄ¶Ë¿Ú  
-		String portname = "COM1";
+        // è·å–è¦æ‰“å¼€çš„ç«¯å£  
+		String portname = "COM2";
         try {  
             portId = CommPortIdentifier.getPortIdentifier(portname);  
         } catch (NoSuchPortException e) {  
-            System.out.println("±§Ç¸,Ã»ÓĞÕÒµ½"+portname+"´®ĞĞ¶Ë¿ÚºÅ!");  
+            System.out.println("æŠ±æ­‰,æ²¡æœ‰æ‰¾åˆ°"+portname+"ä¸²è¡Œç«¯å£å·!");  
             return ;  
         }  
-        // ´ò¿ª¶Ë¿Ú  
+        // æ‰“å¼€ç«¯å£  
         try {  
             serialPort = (SerialPort) portId.open("Mycom", 2000);  
-            System.out.println(portname+"´®¿ÚÒÑ¾­´ò¿ª!");  
+            System.out.println(portname+"ä¸²å£å·²ç»æ‰“å¼€!");  
         } catch (PortInUseException e) {  
-        	System.out.println(portname+"¶Ë¿ÚÒÑ±»Õ¼ÓÃ,Çë¼ì²é!");  
+        	System.out.println(portname+"ç«¯å£å·²è¢«å ç”¨,è¯·æ£€æŸ¥!");  
             return ;  
         }  
           
-        // ÉèÖÃ¶Ë¿Ú²ÎÊı  
+        // è®¾ç½®ç«¯å£å‚æ•°  
         try {  
             int rate = 9600;  
             int data = 8;  
@@ -114,7 +114,7 @@ public class Mycom implements SerialPortEventListener{
         	System.out.println(e.getMessage());  
         }  
   
-        // ´ò¿ª¶Ë¿ÚµÄIOÁ÷¹ÜµÀ   
+        // æ‰“å¼€ç«¯å£çš„IOæµç®¡é“   
         try {   
             outputStream = serialPort.getOutputStream();   
             inputStream = serialPort.getInputStream();   
@@ -122,7 +122,7 @@ public class Mycom implements SerialPortEventListener{
         	System.out.println(e.getMessage());  
         }   
   
-        // ¸ø¶Ë¿ÚÌí¼Ó¼àÌıÆ÷  
+        // ç»™ç«¯å£æ·»åŠ ç›‘å¬å™¨  
         try {   
             serialPort.addEventListener(this);   
         } catch (TooManyListenersException e) {  
@@ -133,7 +133,7 @@ public class Mycom implements SerialPortEventListener{
     }
 	
     /** 
-     * ¸ø´®ĞĞ¶Ë¿Ú·¢ËÍÊı¾İ 
+     * ç»™ä¸²è¡Œç«¯å£å‘é€æ•°æ® 
      */  
     public void sendDataToSeriaPort(String mesg) {   
         try {   
@@ -150,7 +150,7 @@ public class Mycom implements SerialPortEventListener{
 		  Mycom mc = new Mycom();
 		  mc.scanPorts();
 		  mc.openSerialPort();
-		  mc.sendDataToSeriaPort("ÎÒÊÇ¹óÈË");
+		  mc.sendDataToSeriaPort("æˆ‘æ˜¯è´µäºº");
 	}
 
 }

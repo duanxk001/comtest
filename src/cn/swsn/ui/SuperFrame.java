@@ -1,15 +1,10 @@
 package cn.swsn.ui;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.swing.JFrame;
@@ -22,7 +17,7 @@ public class SuperFrame extends JFrame implements MouseListener{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public String title = "Í¨Ñ¶²âÊÔÈí¼þ";
+	public String title = "é€šè®¯æµ‹è¯•è½¯ä»¶";
 	public JPanel jp = new MyJPanel();
 
 	public SuperFrame(){

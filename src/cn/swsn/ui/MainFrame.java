@@ -1,21 +1,11 @@
 package cn.swsn.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
-import java.util.Timer;
+import java.util.Map;
 
-import javax.imageio.ImageIO;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -26,6 +16,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import cn.swsn.comtest.Mycom;
+import cn.swsn.util.DbUtil;
+import cn.swsn.util.PropertyUtil;
 
 public class MainFrame extends SuperFrame {
 
@@ -35,12 +27,12 @@ public class MainFrame extends SuperFrame {
 	private static final long serialVersionUID = 1L;
 
 	public JLabel jt = new JLabel();
-	public JButton jb1 = new JButton("´ğÌâ");
-	public JButton jb2 = new JButton("²é¿´");
-	public JButton jb3 = new JButton("ÉèÖÃ");
+	public JButton jb1 = new JButton("ç­”é¢˜");
+	public JButton jb2 = new JButton("æŸ¥çœ‹");
+	public JButton jb3 = new JButton("è®¾ç½®");
 
 	public MainFrame() {
-		jt.setText("Çëµã»÷ÏÂÃæ°´Å¥¿ªÊ¼²âÊÔ£º");
+		jt.setText("è¯·ç‚¹å‡»ä¸‹é¢æŒ‰é’®å¼€å§‹æµ‹è¯•ï¼š");
 		jt.setBounds(60, 40, 250, 50);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		jb1.addMouseListener(this);
@@ -65,7 +57,13 @@ public class MainFrame extends SuperFrame {
 		} else if (e.getSource().equals(jb2)) {
 			new ViewFrame();
 		} else {
-			new SettingFrame();
+			String pwd = JOptionPane.showInputDialog(this,"è¯·è¾“å…¥å¯†ç ");
+			if("123".equals(pwd)){
+				new SettingFrame();
+			}else{
+				JOptionPane.showMessageDialog(this, "å¯†ç é”™è¯¯ï¼");
+			}
+					
 		}
 
 	}
@@ -76,21 +74,21 @@ class ActionFrame extends SuperFrame implements Runnable {
 
 	private static final long serialVersionUID = -5045490789445946268L;
 	private int time;
-	private JLabel jl_name = new JLabel("ĞÕÃû:");
+	private JLabel jl_name = new JLabel("å§“å:");
 	private JTextField jt_name = new JTextField(10);
-	private JLabel jl_no = new JLabel("Ñ§ºÅ:");
+	private JLabel jl_no = new JLabel("å­¦å·:");
 	private JTextField jt_no = new JTextField(10);
-	private JButton jb1 = new JButton("¿ªÊ¼");
-	private JButton jb2 = new JButton("±£´æ");
-	private JLabel jl_info = new JLabel("´ğÌâĞÅÏ¢£ºÎŞ");
+	private JButton jb1 = new JButton("å¼€å§‹");
+	private JButton jb2 = new JButton("ä¿å­˜");
+	private JLabel jl_info = new JLabel("ç­”é¢˜ä¿¡æ¯ï¼šæ— ");
 	private JTextArea jta = new JTextArea(20, 30);
 	Object[][] playerInfo = new Object[250][4];
-	String[] Names = { "ĞòºÅ", "¶Ë×Ó", "Ãû³Æ", "×´Ì¬" };
+	String[] Names = { "åºå·", "ç«¯å­", "åç§°", "çŠ¶æ€" };
 	Mycom mc = new Mycom();
 
 	ActionFrame() {
 		time = 100;
-		this.setTitle("´ğÌâ²âÊÔ");
+		this.setTitle("ç­”é¢˜æµ‹è¯•");
 		this.remove(jp);
 		this.jp = new JPanel();
 		this.jp.setLayout(null);
@@ -107,6 +105,7 @@ class ActionFrame extends SuperFrame implements Runnable {
 		jt_no.setBounds(200, 20, 100, 24);
 		jb1.setBounds(320, 20, 60, 24);
 		jb2.setBounds(320, 50, 60, 24);
+		jb2.setEnabled(false);
 		scrollPane.setBounds(10, 80, 380, 400);
 		jl_info.setBounds(10, 60, 380, 24);
 		this.jp.prepareImage(null, this);
@@ -127,21 +126,39 @@ class ActionFrame extends SuperFrame implements Runnable {
 		// TODO Auto-generated method stub
 		// new ActionFrame();
 		if (e.getSource().equals(jb1)) {
-			new Thread(this).start();
-			mc.openSerialPort();
-/*			for (int i = 0; i < 250; i++) {
-				
-				 * try { Thread.sleep(50); } catch (InterruptedException e1) {
-				 * // TODO Auto-generated catch block e1.printStackTrace(); }
-				 
-				// jta.append("BAT" + i + "  --> ECU1   µÆ¹â" + i + " --> µÆ¹â3" +
-				// "\n");
-				Object[] obj = { "1", "2", "3", "4" };
-				playerInfo[i] = obj;
-				this.repaint();
-			}*/ 
+			if(jb1.getText().equals("å¼€å§‹")){
+				jb1.setText("ç»“æŸ");
+				jb2.setEnabled(true);
+				new Thread(this).start();
+				mc.openSerialPort();
+			}else{
+				jb1.setText("å¼€å§‹");
+				jb2.setEnabled(false);
+			}
 		} else if (e.getSource().equals(jb2)) {
-			JOptionPane.showMessageDialog(this.getParent(), "±£´æ´ğÌâĞÅÏ¢³É¹¦£¡");
+			if("".equals(jt_name.getText().trim()) || jt_name.getText().trim() == null){
+				JOptionPane.showMessageDialog(this.getParent(), "è¯·è¾“å…¥å§“å");
+			}else{
+				for(int i = 0; i < playerInfo.length; i++){
+					String sql = "insert into t_record (perName,portName,ansName,status) values ('" + 
+								 jt_name.getText().trim() + "','" +
+								 playerInfo[i][1] + "','" +
+								 playerInfo[i][1] + "','" +
+								 playerInfo[i][1] + "')" ;
+					System.out.println(sql);
+					DbUtil.save(sql);
+				}
+				try {
+					DbUtil.closeDB();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(this.getParent(), "æ•°æ®åº“å¼‚å¸¸ï¼");
+				}
+				jb2.setEnabled(false);
+				JOptionPane.showMessageDialog(this.getParent(), "ä¿å­˜ç­”é¢˜ä¿¡æ¯æˆåŠŸï¼");
+			}
+			
 		}
 
 	}
@@ -176,16 +193,16 @@ class ActionFrame extends SuperFrame implements Runnable {
 class ViewFrame extends SuperFrame {
 
 	private static final long serialVersionUID = -6158314552223562499L;
-	private JLabel jl_name = new JLabel("ĞÕÃû");
+	private JLabel jl_name = new JLabel("å§“å");
 	private JTextField jt_name = new JTextField(10);
-	private JButton jb1 = new JButton("ËÑË÷");
-	private JLabel jl_info = new JLabel("´ğÌâĞÅÏ¢£ºÎŞ");
+	private JButton jb1 = new JButton("æœç´¢");
+	private JLabel jl_info = new JLabel("ç­”é¢˜ä¿¡æ¯ï¼šæ— ");
 	private JTextArea jta = new JTextArea(20, 30);
 	Object[][] playerInfo = new Object[250][4];
-	String[] Names = { "ĞòºÅ", "¶Ë×Ó", "Ãû³Æ", "×´Ì¬" };
+	String[] Names = { "åºå·", "ç«¯å­", "åç§°", "çŠ¶æ€" };
 
 	ViewFrame() {
-		this.setTitle("²é¿´´ğÌâĞÅÏ¢");
+		this.setTitle("æŸ¥çœ‹ç­”é¢˜ä¿¡æ¯");
 		this.remove(jp);
 		this.jp = new JPanel();
 		this.jp.setLayout(null);
@@ -213,14 +230,17 @@ class ViewFrame extends SuperFrame {
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
 		// new ActionFrame();
-		for (int i = 0; i < 250; i++) {
-			/*
-			 * try { Thread.sleep(50); } catch (InterruptedException e1) { //
-			 * TODO Auto-generated catch block e1.printStackTrace(); }
-			 */
-			// jta.append("BAT" + i + "  --> ECU1   µÆ¹â" + i + " --> µÆ¹â3" +
-			// "\n");
-			Object[] obj = { "1", "2", "3", "4" };
+		for (int i = 0; i < playerInfo.length; i++) {
+			playerInfo[i] = new Object[4];
+		}
+		this.repaint();
+		List<Map> lists = DbUtil.read("select * from t_record where perName = '" + jt_name.getText().trim() + "'");
+		for (int i = 0; i < lists.size(); i++) {
+			Object[] obj = { 
+					lists.get(i).get("id"),
+					lists.get(i).get("portName"),
+					lists.get(i).get("ansName"),
+					lists.get(i).get("status")};
 			playerInfo[i] = obj;
 			this.repaint();
 		}
@@ -231,25 +251,25 @@ class ViewFrame extends SuperFrame {
 class SettingFrame extends SuperFrame {
 
 	private static final long serialVersionUID = 8778767035322845353L;
-	private JLabel jl_com = new JLabel("¶Ë¿Ú:");
+	private JLabel jl_com = new JLabel("ç«¯å£:");
 	public JTextField jt_com = new JTextField(10);
-	private JLabel jl_name = new JLabel("Ãû³Æ:");
+	private JLabel jl_name = new JLabel("åç§°:");
 	public JTextField jt_name = new JTextField(10);
-	private JLabel jl_time = new JLabel("´ğÌâÊ±¼ä:");
+	private JLabel jl_time = new JLabel("ç­”é¢˜æ—¶é—´:");
 	public JTextField jt_time = new JTextField(20);
-	private JLabel jl_size = new JLabel("ÏÔÊ¾ÌâÄ¿ÊıÁ¿:");
+	private JLabel jl_size = new JLabel("æ˜¾ç¤ºé¢˜ç›®æ•°é‡:");
 	public JTextField jt_size = new JTextField(20);
-	public JButton jb = new JButton("±£´æ");
+	public JButton jb = new JButton("ä¿å­˜");
 
-	private JLabel jl_dburl = new JLabel("Êı¾İ¿âµØÖ·:");
+	private JLabel jl_dburl = new JLabel("æ•°æ®åº“åœ°å€:");
 	public JTextField jt_dburl = new JTextField(50);
-	private JLabel jl_username = new JLabel("ÓÃ»§Ãû:");
+	private JLabel jl_username = new JLabel("ç”¨æˆ·å:");
 	public JTextField jt_username = new JTextField(10);
-	private JLabel jl_passwd = new JLabel("ÃÜÂë:");
+	private JLabel jl_passwd = new JLabel("å¯†ç :");
 	public JTextField jt_passwd = new JTextField(10);
 
 	SettingFrame() {
-		this.setTitle("³ÌĞòÉèÖÃ");
+		this.setTitle("ç¨‹åºè®¾ç½®");
 		jl_com.setBounds(50, 50, 40, 24);
 		jl_name.setBounds(200, 50, 40, 24);
 		jt_com.setBounds(80, 50, 100, 24);
@@ -286,14 +306,36 @@ class SettingFrame extends SuperFrame {
 		this.jp.add(jt_passwd);
 
 		this.jp.add(jb);
+		this.loadProperties();
 		this.setVisible(true);
 		this.repaint();
 	}
 
+	private void loadProperties(){
+		jt_com.setText(PropertyUtil.getProperty("portName"));
+		jt_name.setText(PropertyUtil.getProperty("ansName"));
+		jt_time.setText(PropertyUtil.getProperty("time"));
+		jt_size.setText(PropertyUtil.getProperty("size"));
+		jt_dburl.setText(PropertyUtil.getProperty("db_url"));
+		jt_username.setText(PropertyUtil.getProperty("db_name"));
+		jt_passwd.setText(PropertyUtil.getProperty("db_passwd"));
+	}
+	
+	private void saveProperties(){
+		PropertyUtil.setProperty("portName",jt_com.getText());
+		PropertyUtil.setProperty("ansName",jt_name.getText());
+		PropertyUtil.setProperty("time",jt_time.getText());
+		PropertyUtil.setProperty("size",jt_size.getText());
+		PropertyUtil.setProperty("db_url",jt_dburl.getText());
+		PropertyUtil.setProperty("db_name",jt_username.getText());
+		PropertyUtil.setProperty("db_passwd",jt_passwd.getText());
+	}
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
-		JOptionPane.showMessageDialog(this.getParent(), "±£´æÉèÖÃĞÅÏ¢³É¹¦£¡");
+		saveProperties();
+		JOptionPane.showMessageDialog(this.getParent(), "ä¿å­˜è®¾ç½®ä¿¡æ¯æˆåŠŸï¼");
 	}
 
 }

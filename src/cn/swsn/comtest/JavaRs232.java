@@ -73,10 +73,10 @@ protected String mesg;
 protected int sendCount, reciveCount;  
       
     /** 
-     * Ä¬ÈÏ¹¹Ôìº¯Êı 
+     * é»˜è®¤æ„é€ å‡½æ•° 
      */  
     public JavaRs232() {          
-        super("Java RS-232´®¿ÚÍ¨ĞÅ²âÊÔ³ÌĞò   ·²ÃÎĞÇ³¾");  
+        super("Java RS-232ä¸²å£é€šä¿¡æµ‹è¯•ç¨‹åº   å‡¡æ¢¦æ˜Ÿå°˜");  
         setSize(WIN_WIDTH, WIN_HEIGHT);  
         setLocationRelativeTo(null);  
         Image icon = null;  
@@ -88,37 +88,37 @@ protected int sendCount, reciveCount;
     }  
       
     /** 
-     * ³õÊ¼»¯¸÷UI×é¼ş 
-     * @since 2012-3-22 ÏÂÎç11:56:39 
+     * åˆå§‹åŒ–å„UIç»„ä»¶ 
+     * @since 2012-3-22 ä¸‹åˆ11:56:39 
      */  
     public void initComponents() {        
-        // ¹²ÓÃ³£Á¿  
-        Font lbFont = new Font("Î¢ÈíÑÅºÚ", Font.TRUETYPE_FONT, 14);  
+        // å…±ç”¨å¸¸é‡  
+        Font lbFont = new Font("å¾®è½¯é›…é»‘", Font.TRUETYPE_FONT, 14);  
   
-        // ´´½¨×ó±ßÃæ°å  
+        // åˆ›å»ºå·¦è¾¹é¢æ¿  
         JPanel northPane = new JPanel();  
         northPane.setLayout(new GridLayout(1, 1));  
-        // ÉèÖÃ×ó±ßÃæ°å¸÷×é¼ş  
+        // è®¾ç½®å·¦è¾¹é¢æ¿å„ç»„ä»¶  
         JPanel leftPane = new JPanel();       
         leftPane.setOpaque(false);  
         leftPane.setLayout(new GridLayout(3,2));  
-        JLabel portnameLb = new JLabel("´®¿ÚºÅ£º");  
+        JLabel portnameLb = new JLabel("ä¸²å£å·ï¼š");  
         portnameLb.setFont(lbFont);  
         portnameLb.setHorizontalAlignment(SwingConstants.RIGHT);  
         portCombox = new JComboBox((String [])portList.toArray(new String[0]));  
         portCombox.addActionListener(this);  
-        JLabel databitsLb = new JLabel("Êı¾İÎ»£º");  
+        JLabel databitsLb = new JLabel("æ•°æ®ä½ï¼š");  
         databitsLb.setFont(lbFont);  
         databitsLb.setHorizontalAlignment(SwingConstants.RIGHT);  
         dataCombox = new JComboBox(new Integer[]{5, 6, 7, 8});  
         dataCombox.setSelectedIndex(3);  
         dataCombox.addActionListener(this);  
-        JLabel parityLb = new JLabel("Ğ£ÑéÎ»£º");  
+        JLabel parityLb = new JLabel("æ ¡éªŒä½ï¼š");  
         parityLb.setFont(lbFont);  
         parityLb.setHorizontalAlignment(SwingConstants.RIGHT);  
         parityCombox = new JComboBox(new String[]{"NONE","ODD","EVEN","MARK","SPACE"});  
         parityCombox.addActionListener(this);  
-        // Ìí¼Ó×é¼şÖÁÃæ°å  
+        // æ·»åŠ ç»„ä»¶è‡³é¢æ¿  
         leftPane.add(portnameLb);  
         leftPane.add(portCombox);  
         leftPane.add(databitsLb);  
@@ -126,57 +126,57 @@ protected int sendCount, reciveCount;
         leftPane.add(parityLb);  
         leftPane.add(parityCombox);  
   
-        //´´½¨ÓÒ±ßÃæ°å  
+        //åˆ›å»ºå³è¾¹é¢æ¿  
         JPanel rightPane = new JPanel();  
         rightPane.setLayout(new GridLayout(3,2));  
-        // ÉèÖÃÓÒ±ßÃæ°å¸÷×é¼ş  
-        JLabel baudrateLb = new JLabel("²¨ÌØÂÊ£º");  
+        // è®¾ç½®å³è¾¹é¢æ¿å„ç»„ä»¶  
+        JLabel baudrateLb = new JLabel("æ³¢ç‰¹ç‡ï¼š");  
         baudrateLb.setFont(lbFont);  
         baudrateLb.setHorizontalAlignment(SwingConstants.RIGHT);  
         rateCombox = new JComboBox(new Integer[]{2400,4800,9600,14400,19200,38400,56000});  
         rateCombox.setSelectedIndex(2);  
         rateCombox.addActionListener(this);  
-        JLabel stopbitsLb = new JLabel("Í£Ö¹Î»£º");  
+        JLabel stopbitsLb = new JLabel("åœæ­¢ä½ï¼š");  
         stopbitsLb.setFont(lbFont);  
         stopbitsLb.setHorizontalAlignment(SwingConstants.RIGHT);  
         stopCombox = new JComboBox(new String[]{"1","2","1.5"});  
         stopCombox.addActionListener(this);  
-        openPortBtn = new Button("´ò¿ª¶Ë¿Ú");  
+        openPortBtn = new Button("æ‰“å¼€ç«¯å£");  
         openPortBtn.addActionListener(this);  
-        closePortBtn = new Button("¹Ø±Õ¶Ë¿Ú");    
+        closePortBtn = new Button("å…³é—­ç«¯å£");    
         closePortBtn.addActionListener(this);  
-        // Ìí¼Ó×é¼şÖÁÃæ°å  
+        // æ·»åŠ ç»„ä»¶è‡³é¢æ¿  
         rightPane.add(baudrateLb);  
         rightPane.add(rateCombox);  
         rightPane.add(stopbitsLb);  
         rightPane.add(stopCombox);  
         rightPane.add(openPortBtn);  
         rightPane.add(closePortBtn);  
-        // ½«×óÓÒÃæ°å×éºÏÌí¼Óµ½±±±ßµÄÃæ°å  
+        // å°†å·¦å³é¢æ¿ç»„åˆæ·»åŠ åˆ°åŒ—è¾¹çš„é¢æ¿  
         northPane.add(leftPane);  
         northPane.add(rightPane);  
   
-        // ´´½¨ÖĞ¼äÃæ°å  
+        // åˆ›å»ºä¸­é—´é¢æ¿  
         JPanel centerPane = new JPanel();  
-        // ÉèÖÃÖĞ¼äÃæ°å¸÷×é¼ş  
+        // è®¾ç½®ä¸­é—´é¢æ¿å„ç»„ä»¶  
         sendTf = new TextField(42);  
         readTa = new TextArea(8,50);  
         readTa.setEditable(false);  
         readTa.setBackground(new Color(225,242,250));  
         centerPane.add(sendTf);  
-        sendMsgBtn = new Button(" ·¢ËÍ ");  
+        sendMsgBtn = new Button(" å‘é€ ");  
         sendMsgBtn.addActionListener(this);  
-        // Ìí¼Ó×é¼şÖÁÃæ°å  
+        // æ·»åŠ ç»„ä»¶è‡³é¢æ¿  
         centerPane.add(sendTf);  
         centerPane.add(sendMsgBtn);  
         centerPane.add(readTa);  
           
-        // ÉèÖÃÄÏ±ß×é¼ş  
+        // è®¾ç½®å—è¾¹ç»„ä»¶  
         statusLb = new JLabel();  
         statusLb.setText(initStatus());  
         statusLb.setOpaque(true);  
           
-        // »ñÈ¡Ö÷´°ÌåµÄÈİÆ÷,²¢½«ÒÔÉÏÈıÃæ°åÒÔ±±¡¢ÖĞ¡¢ÄÏµÄ²¼¾ÖÕûºÏ  
+        // è·å–ä¸»çª—ä½“çš„å®¹å™¨,å¹¶å°†ä»¥ä¸Šä¸‰é¢æ¿ä»¥åŒ—ã€ä¸­ã€å—çš„å¸ƒå±€æ•´åˆ  
         JPanel contentPane = (JPanel)getContentPane();  
         contentPane.setLayout(new BorderLayout());  
         contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));  
@@ -187,9 +187,9 @@ protected int sendCount, reciveCount;
     }  
       
     /** 
-     * ³õÊ¼»¯×´Ì¬±êÇ©ÏÔÊ¾ÎÄ±¾ 
+     * åˆå§‹åŒ–çŠ¶æ€æ ‡ç­¾æ˜¾ç¤ºæ–‡æœ¬ 
      * @return String 
-     * @since 2012-3-23 ÉÏÎç12:01:53 
+     * @since 2012-3-23 ä¸Šåˆ12:01:53 
      */  
     public String initStatus() {  
         portname = portCombox.getSelectedItem().toString();  
@@ -198,18 +198,18 @@ protected int sendCount, reciveCount;
         stop = stopCombox.getSelectedItem().toString();  
         parity = parityCombox.getSelectedItem().toString();  
           
-        StringBuffer str = new StringBuffer("µ±Ç°´®¿ÚºÅ:");  
-        str.append(portname).append(" ²¨ÌØÂÊ:");  
-        str.append(rate).append(" Êı¾İÎ»:");  
-        str.append(data).append(" Í£Ö¹Î»:");  
-        str.append(stop).append(" Ğ£ÑéÎ»:");  
+        StringBuffer str = new StringBuffer("å½“å‰ä¸²å£å·:");  
+        str.append(portname).append(" æ³¢ç‰¹ç‡:");  
+        str.append(rate).append(" æ•°æ®ä½:");  
+        str.append(data).append(" åœæ­¢ä½:");  
+        str.append(stop).append(" æ ¡éªŒä½:");  
         str.append(parity);  
         return str.toString();  
     }  
       
     /** 
-     * É¨Ãè±¾»úµÄËùÓĞCOM¶Ë¿Ú 
-     * @since 2012-3-23 ÉÏÎç12:02:42 
+     * æ‰«ææœ¬æœºçš„æ‰€æœ‰COMç«¯å£ 
+     * @since 2012-3-23 ä¸Šåˆ12:02:42 
      */  
     public void scanPorts() {  
         portList = new ArrayList<String>();  
@@ -226,35 +226,35 @@ protected int sendCount, reciveCount;
         }  
         if(null == portList   
                 || portList.isEmpty()) {  
-            showErrMesgbox("Î´ÕÒµ½¿ÉÓÃµÄ´®ĞĞ¶Ë¿ÚºÅ,³ÌĞòÎŞ·¨Æô¶¯!");  
+            showErrMesgbox("æœªæ‰¾åˆ°å¯ç”¨çš„ä¸²è¡Œç«¯å£å·,ç¨‹åºæ— æ³•å¯åŠ¨!");  
             System.exit(0);  
         }  
     }  
       
     /** 
-     * ´ò¿ª´®ĞĞ¶Ë¿Ú 
-     * @since 2012-3-23 ÉÏÎç12:03:07 
+     * æ‰“å¼€ä¸²è¡Œç«¯å£ 
+     * @since 2012-3-23 ä¸Šåˆ12:03:07 
      */  
     public void openSerialPort() {   
-        // »ñÈ¡Òª´ò¿ªµÄ¶Ë¿Ú  
+        // è·å–è¦æ‰“å¼€çš„ç«¯å£  
         try {  
             portId = CommPortIdentifier.getPortIdentifier(portname);  
         } catch (NoSuchPortException e) {  
-            showErrMesgbox("±§Ç¸,Ã»ÓĞÕÒµ½"+portname+"´®ĞĞ¶Ë¿ÚºÅ!");  
+            showErrMesgbox("æŠ±æ­‰,æ²¡æœ‰æ‰¾åˆ°"+portname+"ä¸²è¡Œç«¯å£å·!");  
             setComponentsEnabled(true);  
             return ;  
         }  
-        // ´ò¿ª¶Ë¿Ú  
+        // æ‰“å¼€ç«¯å£  
         try {  
             serialPort = (SerialPort) portId.open("JavaRs232", 2000);  
-            statusLb.setText(portname+"´®¿ÚÒÑ¾­´ò¿ª!");  
+            statusLb.setText(portname+"ä¸²å£å·²ç»æ‰“å¼€!");  
         } catch (PortInUseException e) {  
-            showErrMesgbox(portname+"¶Ë¿ÚÒÑ±»Õ¼ÓÃ,Çë¼ì²é!");  
+            showErrMesgbox(portname+"ç«¯å£å·²è¢«å ç”¨,è¯·æ£€æŸ¥!");  
             setComponentsEnabled(true);  
             return ;  
         }  
           
-        // ÉèÖÃ¶Ë¿Ú²ÎÊı  
+        // è®¾ç½®ç«¯å£å‚æ•°  
         try {  
             int rate = Integer.parseInt(this.rate);  
             int data = Integer.parseInt(this.data);  
@@ -265,7 +265,7 @@ protected int sendCount, reciveCount;
             showErrMesgbox(e.getMessage());  
         }  
   
-        // ´ò¿ª¶Ë¿ÚµÄIOÁ÷¹ÜµÀ   
+        // æ‰“å¼€ç«¯å£çš„IOæµç®¡é“   
         try {   
             outputStream = serialPort.getOutputStream();   
             inputStream = serialPort.getInputStream();   
@@ -273,7 +273,7 @@ protected int sendCount, reciveCount;
             showErrMesgbox(e.getMessage());  
         }   
   
-        // ¸ø¶Ë¿ÚÌí¼Ó¼àÌıÆ÷  
+        // ç»™ç«¯å£æ·»åŠ ç›‘å¬å™¨  
         try {   
             serialPort.addEventListener(this);   
         } catch (TooManyListenersException e) {  
@@ -284,8 +284,8 @@ protected int sendCount, reciveCount;
     }   
       
     /** 
-     * ¸ø´®ĞĞ¶Ë¿Ú·¢ËÍÊı¾İ 
-     * @since 2012-3-23 ÉÏÎç12:05:00 
+     * ç»™ä¸²è¡Œç«¯å£å‘é€æ•°æ® 
+     * @since 2012-3-23 ä¸Šåˆ12:05:00 
      */  
     public void sendDataToSeriaPort() {   
         try {   
@@ -297,12 +297,12 @@ protected int sendCount, reciveCount;
             showErrMesgbox(e.getMessage());  
         }   
           
-        statusLb.setText("  ·¢ËÍ: "+sendCount+"                                      ½ÓÊÕ: "+reciveCount);  
+        statusLb.setText("  å‘é€: "+sendCount+"                                      æ¥æ”¶: "+reciveCount);  
     }   
       
     /** 
-     * ¹Ø±Õ´®ĞĞ¶Ë¿Ú 
-     * @since 2012-3-23 ÉÏÎç12:05:28 
+     * å…³é—­ä¸²è¡Œç«¯å£ 
+     * @since 2012-3-23 ä¸Šåˆ12:05:28 
      */  
     public void closeSerialPort() {   
         try {   
@@ -311,7 +311,7 @@ protected int sendCount, reciveCount;
             if(serialPort != null)  
                 serialPort.close();   
             serialPort = null;  
-            statusLb.setText(portname+"´®¿ÚÒÑ¾­¹Ø±Õ!");  
+            statusLb.setText(portname+"ä¸²å£å·²ç»å…³é—­!");  
             sendCount = 0;  
             reciveCount = 0;  
             sendTf.setText("");  
@@ -322,16 +322,16 @@ protected int sendCount, reciveCount;
     }     
       
     /** 
-     * ÏÔÊ¾´íÎó»ò¾¯¸æĞÅÏ¢ 
-     * @param msg ĞÅÏ¢ 
-     * @since 2012-3-23 ÉÏÎç12:05:47 
+     * æ˜¾ç¤ºé”™è¯¯æˆ–è­¦å‘Šä¿¡æ¯ 
+     * @param msg ä¿¡æ¯ 
+     * @since 2012-3-23 ä¸Šåˆ12:05:47 
      */  
     public void showErrMesgbox(String msg) {  
         JOptionPane.showMessageDialog(this, msg);  
     }  
   
     /** 
-     * ¸÷×é¼şĞĞÎªÊÂ¼ş¼àÌı 
+     * å„ç»„ä»¶è¡Œä¸ºäº‹ä»¶ç›‘å¬ 
      */  
     public void actionPerformed(ActionEvent e) {  
         if(e.getSource() == portCombox  
@@ -354,12 +354,12 @@ protected int sendCount, reciveCount;
           
         if(e.getSource() == sendMsgBtn){  
             if(serialPort == null){  
-                showErrMesgbox("ÇëÏÈ´ò¿ª´®ĞĞ¶Ë¿Ú!");  
+                showErrMesgbox("è¯·å…ˆæ‰“å¼€ä¸²è¡Œç«¯å£!");  
                 return ;  
             }  
             mesg = sendTf.getText();  
             if(null == mesg || mesg.isEmpty()){  
-                showErrMesgbox("ÇëÊäÈëÄãÒª·¢ËÍµÄÄÚÈİ!");  
+                showErrMesgbox("è¯·è¾“å…¥ä½ è¦å‘é€çš„å†…å®¹!");  
                 return ;  
             }  
             sendDataToSeriaPort();  
@@ -367,7 +367,7 @@ protected int sendCount, reciveCount;
     }  
   
     /** 
-     * ¶Ë¿ÚÊÂ¼ş¼àÌı 
+     * ç«¯å£äº‹ä»¶ç›‘å¬ 
      */  
     public void serialEvent(SerialPortEvent event) {  
         switch (event.getEventType()) {  
@@ -392,7 +392,7 @@ protected int sendCount, reciveCount;
                 receivedMsg.append(new String(readBuffer).trim()).append(" --/\n");  
                 readTa.append(receivedMsg.toString());  
                 reciveCount++;  
-                statusLb.setText("  ·¢ËÍ: "+sendCount+"                                      ½ÓÊÕ: "+reciveCount);  
+                statusLb.setText("  å‘é€: "+sendCount+"                                      æ¥æ”¶: "+reciveCount);  
             } catch (IOException e) {  
                 showErrMesgbox(e.getMessage());  
             }  
@@ -400,9 +400,9 @@ protected int sendCount, reciveCount;
     }  
       
     /** 
-     * ÉèÖÃ¸÷×é¼şµÄ¿ª¹Ø×´Ì¬ 
-     * @param enabled ×´Ì¬ 
-     * @since 2012-3-23 ÉÏÎç12:06:24 
+     * è®¾ç½®å„ç»„ä»¶çš„å¼€å…³çŠ¶æ€ 
+     * @param enabled çŠ¶æ€ 
+     * @since 2012-3-23 ä¸Šåˆ12:06:24 
      */  
     public void setComponentsEnabled(boolean enabled) {  
         openPortBtn.setEnabled(enabled);  
@@ -415,9 +415,9 @@ protected int sendCount, reciveCount;
     }  
       
     /** 
-     * ÔËĞĞÖ÷º¯Êı 
+     * è¿è¡Œä¸»å‡½æ•° 
      * @param args 
-     * @since 2012-3-23 ÉÏÎç12:06:45 
+     * @since 2012-3-23 ä¸Šåˆ12:06:45 
      */  
     public static void main(String[] args) {  
         new JavaRs232();          

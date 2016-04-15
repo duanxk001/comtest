@@ -14,7 +14,7 @@ public class Test {
 		CommPortIdentifier portId;
 		while (en.hasMoreElements()) {
 			portId = (CommPortIdentifier) en.nextElement();
-			// Èç¹û¶Ë¿ÚÀàĞÍÊÇ´®¿Ú£¬Ôò´òÓ¡³öÆä¶Ë¿ÚĞÅÏ¢
+			// å¦‚æœç«¯å£ç±»å‹æ˜¯ä¸²å£ï¼Œåˆ™æ‰“å°å‡ºå…¶ç«¯å£ä¿¡æ¯
 			if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
 				System.out.println(portId.getName());
 			}

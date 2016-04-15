@@ -7,7 +7,7 @@ import javax.swing.UIManager;
 public class MainTest {
 
 	public static void main(String[] args) {
-		Font font = new Font("Î¢ÈíÑÅºÚ",Font.PLAIN,12);
+		Font font = new Font("å¾®è½¯é›…é»‘",Font.PLAIN,12);
         UIManager.put("Button.font", font); 
         UIManager.put("Label.font", font);
 		new MainFrame();
