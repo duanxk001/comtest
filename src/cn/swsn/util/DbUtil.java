@@ -10,10 +10,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
+
+import cn.swsn.ui.MainFrame;
+
 public class DbUtil {
 
 	public static Connection conn = null;
 	public static Statement smt = null;
+	
+	public static MainFrame mf = null;
 	public static Connection getConnect(){
 		
 		String acount = "?user=" + PropertyUtil.getProperty("db_name") + "&password=" + PropertyUtil.getProperty("db_passwd") + "&useUnicode=true&characterEncoding=UTF8";
@@ -39,6 +45,8 @@ public class DbUtil {
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
+				if(mf !=null )
+					JOptionPane.showMessageDialog(mf, "数据库连接失败！");
 			}
 		}
 		try {
@@ -90,9 +98,9 @@ public class DbUtil {
 			while(rs.next()){
 				Map map = new HashMap();
 				map.put("id",rs.getObject(1));
-				map.put("protName",rs.getObject(2));
-				map.put("ansName",rs.getObject(3));
-				map.put("status",rs.getObject(4));
+				map.put("protName",rs.getObject(3));
+				map.put("ansName",rs.getObject(4));
+				map.put("status",rs.getObject(5));
 				resultList.add(map);
 			}
 		} catch (SQLException e) {
@@ -103,8 +111,12 @@ public class DbUtil {
 	}
 	
 	public static void closeDB() throws SQLException{
-		smt.close();
-		conn.close();
+		if(smt != null){
+			smt.close();
+		}
+		if(conn != null){
+			conn.close();
+		}
 	}
 	public static void main(String[] args) {
 		getConnect();

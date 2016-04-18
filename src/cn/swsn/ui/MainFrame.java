@@ -1,7 +1,11 @@
 package cn.swsn.ui;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +51,7 @@ public class MainFrame extends SuperFrame {
 		this.jp.add(jb3);
 		this.setVisible(true);
 		this.repaint();
+		DbUtil.mf = this;
 	}
 	
 	@Override
@@ -70,7 +75,7 @@ public class MainFrame extends SuperFrame {
 
 }
 
-class ActionFrame extends SuperFrame implements Runnable {
+class ActionFrame extends SuperFrame implements Runnable,WindowListener{
 
 	private static final long serialVersionUID = -5045490789445946268L;
 	private int time;
@@ -84,10 +89,11 @@ class ActionFrame extends SuperFrame implements Runnable {
 	private JTextArea jta = new JTextArea(20, 30);
 	Object[][] playerInfo = new Object[250][4];
 	String[] Names = { "序号", "端子", "名称", "状态" };
-	Mycom mc = new Mycom();
+	Mycom mc = Mycom.getMC();
+	Thread th = null;
 
 	ActionFrame() {
-		time = 100;
+		time = Integer.parseInt(PropertyUtil.getProperty("time")) * 600;
 		this.setTitle("答题测试");
 		this.remove(jp);
 		this.jp = new JPanel();
@@ -95,6 +101,7 @@ class ActionFrame extends SuperFrame implements Runnable {
 		this.jp.setBounds(0, 0, 400,500);
 		this.add(jp);
 		JTable table = new JTable(playerInfo, Names);
+		table.setDefaultRenderer(Object.class, new ColorTableCellRenderer());
 		table.setPreferredScrollableViewportSize(new Dimension(550, 30));
 		JScrollPane scrollPane = new JScrollPane(table);
 		jb1.addMouseListener(this);
@@ -118,6 +125,7 @@ class ActionFrame extends SuperFrame implements Runnable {
 		this.jp.add(jl_info);
 		this.jp.add(scrollPane);
 		this.setVisible(true);
+		this.addWindowListener(this);
 		this.repaint();
 	}
 
@@ -129,31 +137,35 @@ class ActionFrame extends SuperFrame implements Runnable {
 			if(jb1.getText().equals("开始")){
 				jb1.setText("结束");
 				jb2.setEnabled(true);
-				new Thread(this).start();
-				mc.openSerialPort();
+				mc.listenData();
+				time = Integer.parseInt(PropertyUtil.getProperty("time")) * 600;
+				for (int i = 0; i < playerInfo.length; i++) {
+					playerInfo[i] = new Object[4];
+				}
+				th = new Thread(this);
+				th.start();
 			}else{
 				jb1.setText("开始");
 				jb2.setEnabled(false);
+				time = 0;
+				//mc.sendDataToSeriaPort("ok");
+				mc.stopListenData();
+				th.stop();
 			}
 		} else if (e.getSource().equals(jb2)) {
 			if("".equals(jt_name.getText().trim()) || jt_name.getText().trim() == null){
 				JOptionPane.showMessageDialog(this.getParent(), "请输入姓名");
 			}else{
 				for(int i = 0; i < playerInfo.length; i++){
-					String sql = "insert into t_record (perName,portName,ansName,status) values ('" + 
+					if(playerInfo[i][3] != null && !"".equals(playerInfo[i][3])){
+						String sql = "insert into t_record (perName,portName,ansName,status) values ('" + 
 								 jt_name.getText().trim() + "','" +
 								 playerInfo[i][1] + "','" +
-								 playerInfo[i][1] + "','" +
-								 playerInfo[i][1] + "')" ;
+								 playerInfo[i][2] + "','" +
+								 playerInfo[i][3] + "')" ;
 					System.out.println(sql);
 					DbUtil.save(sql);
-				}
-				try {
-					DbUtil.closeDB();
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-					JOptionPane.showMessageDialog(this.getParent(), "数据库异常！");
+					}
 				}
 				jb2.setEnabled(false);
 				JOptionPane.showMessageDialog(this.getParent(), "保存答题信息成功！");
@@ -167,25 +179,84 @@ class ActionFrame extends SuperFrame implements Runnable {
 	public void run() {
 		// TODO Auto-generated method stub
 		List<String> results = mc.results;
-		int i = 0;
+		String comm = PropertyUtil.getProperty("portName");
+		String aname = PropertyUtil.getProperty("ansName");
+		//int i = 0;
+		int count = 0;
 		while (time > 0) {
 			try {
-				jl_info.setText(time-- + "");
-				if(results.size() > 0){
-					for(int j = i; j < results.size(); j++){
-						Object[] obj = { "1", "2", "3", results.get(i) };
-						playerInfo[i] = obj;
-					}
-					i = results.size() - 1;
+				int tem = time--;
+				String ss = "答题数：" + count + ".  剩余时间:" + tem/600 + "分" + (tem/10)%60 + "秒";
+				jl_info.setText(ss);
+				if(results.size() > count){
+					//for(int j = count; j < results.size(); j++){
+						Object[] obj = { count, comm, aname, results.get(count) };
+						playerInfo[count] = obj;
+						count ++;
+					//}
+					//i = results.size() - 1;
 				}
 				this.repaint();
-				Thread.sleep(1000);
+				Thread.sleep(100);
+				if(time == 0){
+					//mc.sendDataToSeriaPort("ok");
+					mc.stopListenData();
+				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
 		}
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		// TODO Auto-generated method stub
+		th.stop();
+		System.out.println("线程关闭");
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		// TODO Auto-generated method stub
+		if(th != null){
+			th.stop();
+		}
+		if(mc != null){
+			mc.stopListenData();
+		}
+		System.out.println("线程关闭");
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
@@ -210,6 +281,7 @@ class ViewFrame extends SuperFrame {
 		this.add(jp);
 		JTable table = new JTable(playerInfo, Names);
 		table.setPreferredScrollableViewportSize(new Dimension(550, 30));
+		table.setDefaultRenderer(Object.class, new ColorTableCellRenderer());
 		JScrollPane scrollPane = new JScrollPane(table);
 		jb1.addMouseListener(this);
 		jl_name.setBounds(10, 20, 40, 24);
@@ -234,7 +306,9 @@ class ViewFrame extends SuperFrame {
 			playerInfo[i] = new Object[4];
 		}
 		this.repaint();
-		List<Map> lists = DbUtil.read("select * from t_record where perName = '" + jt_name.getText().trim() + "'");
+		String sql = "select * from t_record where perName = '" + jt_name.getText().trim() + "'";
+		System.out.println(sql);
+		List<Map> lists = DbUtil.read(sql);
 		for (int i = 0; i < lists.size(); i++) {
 			Object[] obj = { 
 					lists.get(i).get("id"),

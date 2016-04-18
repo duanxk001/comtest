@@ -1,5 +1,6 @@
 package cn.swsn.comtest;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,8 +17,11 @@ import javax.comm.SerialPortEvent;
 import javax.comm.SerialPortEventListener;
 import javax.comm.UnsupportedCommOperationException;
 
+import cn.swsn.util.PropertyUtil;
+
 public class Mycom implements SerialPortEventListener{
 
+	private static Mycom mc = null;
 	protected int sendCount, reciveCount;
 	protected InputStream inputStream = null;
 	protected OutputStream outputStream = null;
@@ -27,6 +31,13 @@ public class Mycom implements SerialPortEventListener{
 	protected SerialPort serialPort;
 	
 	public List<String> results = new ArrayList<String>();
+	
+	public static Mycom getMC(){
+		if(mc == null){
+			mc = new Mycom();
+		}
+		return mc;
+	}
 	
 	@Override
 	public void serialEvent(SerialPortEvent event) {
@@ -43,9 +54,49 @@ public class Mycom implements SerialPortEventListener{
         case SerialPortEvent.OUTPUT_BUFFER_EMPTY:  
             break;  
         case SerialPortEvent.DATA_AVAILABLE:  
-            byte[] readBuffer = new byte[50];  
-
-        try {  
+            byte[] readBuffer = new byte[256];  
+            dealAsByte(readBuffer);
+  		    break;
+  		default:
+  		    mc.sendDataToSeriaPort(false);
+        	
+    }
+	}
+	
+	public void dealAsByte(byte[] readBuffer){
+		try {  
+            while (inputStream.available() > 0) {  
+                inputStream.read(readBuffer);  
+            }
+            
+            if("e1".equals(Integer.toHexString((int)readBuffer[0] & 0xFF))
+            	&& "d2".equals(Integer.toHexString((int)readBuffer[1] & 0xFF))){
+            		int c = ((int)readBuffer[2])/8;
+            		for(int i = 0; i < c; i++){
+            			int l = readBuffer[3 + i];
+            			String str2=Integer.toBinaryString(l);
+            			String[] bs = str2.split("");
+            			for(int j = 0; j < 8; j++){
+            				if(j < (9 - bs.length)){
+            					results.add("0");
+            				}else{
+            					results.add(bs[j - (8 - bs.length)]);
+            				}
+            			}
+                     	System.out.println("int:" + (int)readBuffer[3 + i] + " HexString:" + Integer.toHexString((int)readBuffer[3 + i] & 0xFF));
+                     }
+            		mc.sendDataToSeriaPort(true);
+            }else{
+      		    mc.sendDataToSeriaPort(false);
+            }
+            
+        } catch (IOException e) {  
+            System.out.println(e.getMessage());  
+        } 
+    } 
+	
+	public void dealAsString(byte[] readBuffer){
+		try {  
             while (inputStream.available() > 0) {  
                 inputStream.read(readBuffer);  
             }  
@@ -57,9 +108,8 @@ public class Mycom implements SerialPortEventListener{
             System.out.println("  发送: "+sendCount+"                                      接收: "+reciveCount);  
         } catch (IOException e) {  
             System.out.println(e.getMessage());  
-        }  
+        } 
     } 
-	}
 	
 	//打开端口
 	public void scanPorts(){
@@ -87,16 +137,21 @@ public class Mycom implements SerialPortEventListener{
 	 */
 	public void openSerialPort() {   
         // 获取要打开的端口  
-		String portname = "COM2";
-        try {  
-            portId = CommPortIdentifier.getPortIdentifier(portname);  
-        } catch (NoSuchPortException e) {  
-            System.out.println("抱歉,没有找到"+portname+"串行端口号!");  
-            return ;  
-        }  
+		String portname = PropertyUtil.getProperty("portName");
+		if(portId == null){
+	        try {  
+	            portId = CommPortIdentifier.getPortIdentifier(portname);  
+	        } catch (NoSuchPortException e) {  
+	            System.out.println("抱歉,没有找到"+portname+"串行端口号!");  
+	            return ;  
+	        } 
+		}
+ 
         // 打开端口  
         try {  
-            serialPort = (SerialPort) portId.open("Mycom", 2000);  
+        	if(serialPort == null){
+        		serialPort = (SerialPort) portId.open("Mycom", 2000); 
+        	}
             System.out.println(portname+"串口已经打开!");  
         } catch (PortInUseException e) {  
         	System.out.println(portname+"端口已被占用,请检查!");  
@@ -122,35 +177,73 @@ public class Mycom implements SerialPortEventListener{
         	System.out.println(e.getMessage());  
         }   
   
-        // 给端口添加监听器  
+    }
+	
+	public void listenData(){
+		if(serialPort == null){
+			openSerialPort();
+		}
+		 // 给端口添加监听器  
         try {   
             serialPort.addEventListener(this);   
         } catch (TooManyListenersException e) {  
         	System.out.println(e.getMessage());  
         }   
   
-        serialPort.notifyOnDataAvailable(true);   
-    }
+        serialPort.notifyOnDataAvailable(true); 
+	}
+	
+	public void stopListenData(){
+		if(serialPort != null){
+			serialPort.removeEventListener();   
+		    serialPort.notifyOnDataAvailable(false);
+		    results = new ArrayList<String>();
+		}
+	}
 	
     /** 
      * 给串行端口发送数据 
      */  
-    public void sendDataToSeriaPort(String mesg) {   
+    public void sendDataToSeriaPort(boolean t) { 
+    	
+    	byte[] res = null;
+    	if(t){
+    		res = new byte[]{(byte)0xa1,(byte)0xb2,(byte)0xc3,(byte)0xd4};
+    	}else{
+    		res = new byte[]{(byte)0x51,(byte)0x62,(byte)0x73,(byte)0x84};
+    	}
         try {   
             sendCount++;  
-            outputStream.write(mesg.getBytes());   
+            outputStream.write(res);   
             outputStream.flush();   
   
         } catch (IOException e) {   
             System.out.println(e.getMessage());  
         }   
     }
-	
+    
+    /*
+     * 关闭串口
+     */
 	public static void main(String[] args) {
-		  Mycom mc = new Mycom();
+		 /* Mycom mc = new Mycom();
 		  mc.scanPorts();
 		  mc.openSerialPort();
-		  mc.sendDataToSeriaPort("我是贵人");
+		  byte[] bs = new byte[]{(byte)0xa1,(byte)0xb2,(byte)0xc3,(byte)0xd4};*/
+		  //mc.sendDataToSeriaPort(bs);
+		System.out.println(System.getProperty("java.home") + 
+			      File.separator + 
+			      "lib" + 
+			      File.separator + 
+			      "javax.comm.properties");		
+	/*	String str="1f";
+		int i=Integer.parseInt(str,16);
+		String str2=Integer.toBinaryString(i);
+		System.out.println(str2);
+		byte[] bs = new Integer(16).toString().getBytes();
+		for(byte b : bs){
+			System.out.println(b);
+		}*/
 	}
 
 }
