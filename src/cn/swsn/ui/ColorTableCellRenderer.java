@@ -33,11 +33,11 @@ class ColorTableCellRenderer extends DefaultTableCellRenderer
     DefaultTableCellRenderer renderer=new DefaultTableCellRenderer();  
     public Component getTableCellRendererComponent(JTable table, Object value,  
         boolean isSelected, boolean hasFocus, int row, int column) {  
-        if(column == 3 && value != null && !"null".equals(value.toString()) && Integer.parseInt(value.toString()) == 1){  
+        if(column == 2 && value != null && !"null".equals(value.toString()) && Integer.parseInt(value.toString()) == 1){  
             //调用基类方法  
             flag = true;
         	return super.getTableCellRendererComponent(table, value, isSelected,hasFocus, row, column);  
-        }else if(column == 3 && value != null && !"null".equals(value.toString()) && Integer.parseInt(value.toString()) == 0){
+        }else if(column == 2 && value != null && !"null".equals(value.toString()) && Integer.parseInt(value.toString()) == 0){
         	flag = false;
         	return super.getTableCellRendererComponent(table, value, isSelected,hasFocus, row, column);
         }  

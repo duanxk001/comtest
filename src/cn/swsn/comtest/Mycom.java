@@ -31,6 +31,7 @@ public class Mycom implements SerialPortEventListener{
 	protected SerialPort serialPort;
 	
 	public List<String> results = new ArrayList<String>();
+	public List<String> firstBit = new ArrayList<String>();
 	
 	public static Mycom getMC(){
 		if(mc == null){
@@ -68,11 +69,32 @@ public class Mycom implements SerialPortEventListener{
             while (inputStream.available() > 0) {  
                 inputStream.read(readBuffer);  
             }
-            
-            if("e1".equals(Integer.toHexString((int)readBuffer[0] & 0xFF))
-            	&& "d2".equals(Integer.toHexString((int)readBuffer[1] & 0xFF))){
-            		int c = ((int)readBuffer[2])/8;
-            		for(int i = 0; i < c; i++){
+            int index = 0;
+            //while(index < readBuffer.length){
+            	if("e1".equals(Integer.toHexString((int)readBuffer[index] & 0xFF))
+                    	&& "d2".equals(Integer.toHexString((int)readBuffer[index+1] & 0xFF))){
+            		//int c = ((int)readBuffer[2])/8;
+            		int fb = (int)readBuffer[index+2] & 0xFF;
+//            		String str3 = Integer.toBinaryString(c);
+            		int l = readBuffer[index+3];
+            		String str2=Integer.toBinaryString(l);
+            		String[] bs = str2.split("");
+        			for(int j = 0; j < 8; j++){
+        				if(j < (bs.length - 1)){
+        					results.add(bs[bs.length - 1 -j]);
+        				}else{
+        					results.add("0");
+        				}
+        				firstBit.add("" + fb++);
+        				/*if(j < (9 - bs.length)){
+        					results.add("0");
+        				}else{
+        					results.add(bs[j - (8 - bs.length)]);
+        				}*/
+        			}
+        			mc.sendDataToSeriaPort(true);
+        			index += 5;
+            		/*for(int i = 0; i < c; i++){
             			int l = readBuffer[3 + i];
             			String str2=Integer.toBinaryString(l);
             			String[] bs = str2.split("");
@@ -85,11 +107,17 @@ public class Mycom implements SerialPortEventListener{
             			}
                      	System.out.println("int:" + (int)readBuffer[3 + i] + " HexString:" + Integer.toHexString((int)readBuffer[3 + i] & 0xFF));
                      }
-            		mc.sendDataToSeriaPort(true);
+            		mc.sendDataToSeriaPort(true);*/
             }else{
       		    mc.sendDataToSeriaPort(false);
+      		    try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
             }
-            
+          //  }
         } catch (IOException e) {  
             System.out.println(e.getMessage());  
         } 
@@ -115,11 +143,15 @@ public class Mycom implements SerialPortEventListener{
 	public void scanPorts(){
 		portList = new ArrayList<String>();  
         Enumeration<?> en = CommPortIdentifier.getPortIdentifiers();  
-        CommPortIdentifier portId;  
+        CommPortIdentifier portId; 
+        System.out.println(en.hasMoreElements());
         while(en.hasMoreElements()){  
-            portId = (CommPortIdentifier) en.nextElement();  
+            portId = (CommPortIdentifier) en.nextElement(); 
+            System.out.println("端口类型：" + portId.getPortType());
+            System.out.println("设置的端口类型：" + CommPortIdentifier.PORT_SERIAL);
             if(portId.getPortType() == CommPortIdentifier.PORT_SERIAL){  
                 String name = portId.getName();  
+                System.out.println("找到的port：" + name);
                 if(!portList.contains(name)) {  
                     portList.add(name);  
                 }  
@@ -140,6 +172,7 @@ public class Mycom implements SerialPortEventListener{
 		String portname = PropertyUtil.getProperty("portName");
 		if(portId == null){
 	        try {  
+	        	System.out.println("portId:" + portId + "设置的port" + portname);
 	            portId = CommPortIdentifier.getPortIdentifier(portname);  
 	        } catch (NoSuchPortException e) {  
 	            System.out.println("抱歉,没有找到"+portname+"串行端口号!");  
@@ -226,24 +259,25 @@ public class Mycom implements SerialPortEventListener{
      * 关闭串口
      */
 	public static void main(String[] args) {
-		 /* Mycom mc = new Mycom();
+		  Mycom mc = new Mycom();
 		  mc.scanPorts();
 		  mc.openSerialPort();
-		  byte[] bs = new byte[]{(byte)0xa1,(byte)0xb2,(byte)0xc3,(byte)0xd4};*/
+		  //byte[] bs = new byte[]{(byte)0xa1,(byte)0xb2,(byte)0xc3,(byte)0xd4};*/
 		  //mc.sendDataToSeriaPort(bs);
 		System.out.println(System.getProperty("java.home") + 
 			      File.separator + 
 			      "lib" + 
 			      File.separator + 
-			      "javax.comm.properties");		
-	/*	String str="1f";
+			      "javax.comm.properties");
+		String str="1f";
 		int i=Integer.parseInt(str,16);
 		String str2=Integer.toBinaryString(i);
 		System.out.println(str2);
 		byte[] bs = new Integer(16).toString().getBytes();
 		for(byte b : bs){
 			System.out.println(b);
-		}*/
+		}
+
 	}
 
 }

@@ -88,13 +88,14 @@ class ActionFrame extends SuperFrame implements Runnable,WindowListener{
 	private JLabel jl_info = new JLabel("答题信息：无");
 	private JTextArea jta = new JTextArea(20, 30);
 	Object[][] playerInfo = new Object[250][4];
-	String[] Names = { "序号", "端子", "名称", "状态" };
+	String[] Names = { "序号", "左端子", "状态", "右端子"};
 	Mycom mc = Mycom.getMC();
 	Thread th = null;
 
 	ActionFrame() {
 		time = Integer.parseInt(PropertyUtil.getProperty("time")) * 600;
 		this.setTitle("答题测试");
+		this.setSize(400, 500);
 		this.remove(jp);
 		this.jp = new JPanel();
 		this.jp.setLayout(null);
@@ -161,8 +162,8 @@ class ActionFrame extends SuperFrame implements Runnable,WindowListener{
 						String sql = "insert into t_record (perName,portName,ansName,status) values ('" + 
 								 jt_name.getText().trim() + "','" +
 								 playerInfo[i][1] + "','" +
-								 playerInfo[i][2] + "','" +
-								 playerInfo[i][3] + "')" ;
+								 playerInfo[i][3] + "','" +
+								 playerInfo[i][2] + "')" ;
 					System.out.println(sql);
 					DbUtil.save(sql);
 					}
@@ -181,6 +182,15 @@ class ActionFrame extends SuperFrame implements Runnable,WindowListener{
 		List<String> results = mc.results;
 		String comm = PropertyUtil.getProperty("portName");
 		String aname = PropertyUtil.getProperty("ansName");
+		String cname = PropertyUtil.getProperty("db_cname");
+		String[] cnames = cname.split("&");
+		String[][] comms = new String[256][3];
+		if(cname != "" && cnames.length > 0){
+			for (int i = 0; i < cnames.length; i++) {
+				String[] tem = cnames[i].split("_");
+				comms[i] = tem;
+			}
+		}
 		//int i = 0;
 		int count = 0;
 		while (time > 0) {
@@ -188,11 +198,18 @@ class ActionFrame extends SuperFrame implements Runnable,WindowListener{
 				int tem = time--;
 				String ss = "答题数：" + count + ".  剩余时间:" + tem/600 + "分" + (tem/10)%60 + "秒";
 				jl_info.setText(ss);
-				if(results.size() > count){
+				if(results.size() > 0){
 					//for(int j = count; j < results.size(); j++){
-						Object[] obj = { count, comm, aname, results.get(count) };
-						playerInfo[count] = obj;
-						count ++;
+						Object[] obj = { mc.firstBit.get(count), comms[count][1],results.get(count),comms[count][2]};
+						int fb = Integer.parseInt(mc.firstBit.get(count));
+						playerInfo[fb] = obj;
+						count++;
+						if(count >= results.size()){
+							count = 0;
+						}
+						/*if(count > 248){
+							count = 0;
+						}*/
 					//}
 					//i = results.size() - 1;
 				}
@@ -270,7 +287,7 @@ class ViewFrame extends SuperFrame {
 	private JLabel jl_info = new JLabel("答题信息：无");
 	private JTextArea jta = new JTextArea(20, 30);
 	Object[][] playerInfo = new Object[250][4];
-	String[] Names = { "序号", "端子", "名称", "状态" };
+	String[] Names = { "序号", "左端子", "状态", "右端子" };
 
 	ViewFrame() {
 		this.setTitle("查看答题信息");
@@ -313,8 +330,8 @@ class ViewFrame extends SuperFrame {
 			Object[] obj = { 
 					lists.get(i).get("id"),
 					lists.get(i).get("portName"),
-					lists.get(i).get("ansName"),
-					lists.get(i).get("status")};
+					lists.get(i).get("status"),
+					lists.get(i).get("ansName")};
 			playerInfo[i] = obj;
 			this.repaint();
 		}
@@ -334,6 +351,7 @@ class SettingFrame extends SuperFrame {
 	private JLabel jl_size = new JLabel("显示题目数量:");
 	public JTextField jt_size = new JTextField(20);
 	public JButton jb = new JButton("保存");
+	public JButton jb1 = new JButton("设置端子名称");
 
 	private JLabel jl_dburl = new JLabel("数据库地址:");
 	public JTextField jt_dburl = new JTextField(50);
@@ -361,7 +379,9 @@ class SettingFrame extends SuperFrame {
 		jt_passwd.setBounds(130, 330, 100, 24);
 
 		jb.addMouseListener(this);
-		jb.setBounds(160, 380, 60, 24);
+		jb1.addMouseListener(this);
+		jb.setBounds(80, 380, 60, 24);
+		jb1.setBounds(160, 380, 160, 24);
 
 		this.jp.add(jl_com);
 		this.jp.add(jt_com);
@@ -380,6 +400,7 @@ class SettingFrame extends SuperFrame {
 		this.jp.add(jt_passwd);
 
 		this.jp.add(jb);
+		this.jp.add(jb1);
 		this.loadProperties();
 		this.setVisible(true);
 		this.repaint();
@@ -408,8 +429,108 @@ class SettingFrame extends SuperFrame {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
-		saveProperties();
-		JOptionPane.showMessageDialog(this.getParent(), "保存设置信息成功！");
+		if(e.getSource().equals(jb1)){
+			new CNameFrame();
+		}else{
+			saveProperties();
+			JOptionPane.showMessageDialog(this.getParent(), "保存设置信息成功！");
+		}
+	}
+
+}
+
+class CNameFrame extends SuperFrame {
+
+	private static final long serialVersionUID = -6158314552223562499L;
+	private JLabel jl_size = new JLabel("端子个数:");
+	private JTextField jt_size = new JTextField(10);
+	private JButton jb1 = new JButton("确定");
+	public JLabel jl_desc = new JLabel("请双击单元格进行修改！");
+	private JButton jb = new JButton("保存");
+	Object[][] playerInfo = new Object[256][3];
+	String[] Names = { "序号", "左端子","右端子" };
+
+	CNameFrame() {
+		this.setTitle("设置端子详细名称");
+		this.remove(jp);
+		this.jp = new JPanel();
+		this.jp.setLayout(null);
+		this.jp.setBounds(0, 0, 400,500);
+		this.add(jp);
+		JTable table = new JTable(playerInfo, Names);
+		table.setPreferredScrollableViewportSize(new Dimension(550, 30));
+		//table.setDefaultRenderer(Object.class, new ColorTableCellRenderer());
+		JScrollPane scrollPane = new JScrollPane(table);
+		jb1.addMouseListener(this);
+		jb.addMouseListener(this);
+		jb.setBounds(260, 20, 60, 24);
+		jb1.setBounds(180, 20, 60, 24);
+		jl_size.setBounds(20, 20, 60, 24);
+		jt_size.setBounds(80, 20, 60, 24);
+		jt_size.setText("256");
+		jl_desc.setBounds(20, 50, 180, 24);
+		scrollPane.setBounds(10, 80, 380, 400);
+		this.jp.add(jb1);
+		this.jp.add(jb);
+		this.jp.add(jl_size);
+		this.jp.add(jt_size);
+		this.jp.add(jl_desc);
+		this.jp.add(scrollPane);
+		this.setVisible(true);
+		
+		String cname = PropertyUtil.getProperty("db_cname");
+		String[] cnames = cname.split("&");
+		if(cname != "" && cnames.length > 0){
+			for (int i = 0; i < cnames.length; i++) {
+				String[] tem = cnames[i].split("_");
+				Object[] obj = { 
+						Integer.parseInt(tem[0]),
+						tem[1],
+						tem[2]};
+				playerInfo[i] = obj;
+			}
+		}else{
+			for (int i = 0; i < 256; i++) {
+				Object[] obj = { 
+						i,
+						"端子A",
+						"端子B"};
+				playerInfo[i] = obj;
+			}
+		}
+		this.repaint();
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+		if(e.getSource().equals(jb1)){
+			int l = Integer.parseInt(jt_size.getText());
+			for (int i = 0; i < playerInfo.length; i++) {
+				playerInfo[i] = new Object[3];
+			}
+			this.repaint();
+			for (int i = 0; i < l; i++) {
+				Object[] obj = { 
+						i,
+						"端子A",
+						"端子B"};
+				playerInfo[i] = obj;
+				this.repaint();
+			}
+		}else{
+			String cname = "";
+			for (int i = 0; i < playerInfo.length; i++) {
+				cname = cname.concat("" + playerInfo[i][0]);
+				for(int j = 1; j < playerInfo[i].length; j++){
+					cname = cname.concat("_" + playerInfo[i][j]);
+				}
+				cname = cname.concat("&");
+			}
+			//System.out.println(cname);
+			PropertyUtil.setProperty("db_cname", cname);
+			JOptionPane.showMessageDialog(this.getParent(), "保存成功！");
+		}
 	}
 
 }
