@@ -31,7 +31,7 @@ public class PropertyUtil {
         try {   
             prop.load(in);   
             result = new String(prop.getProperty(str).trim().getBytes("ISO-8859-1"),"UTF8");  
-            System.out.println(result);
+            //System.out.println(result);
             //System.out.println(getEncoding(result));
         } catch (IOException e) {   
             e.printStackTrace();   

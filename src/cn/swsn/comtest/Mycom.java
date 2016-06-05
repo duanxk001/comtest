@@ -70,7 +70,8 @@ public class Mycom implements SerialPortEventListener{
                 inputStream.read(readBuffer);  
             }
             int index = 0;
-            //while(index < readBuffer.length){
+            while(index < 5){
+            	System.out.println("处理新数据：" + Integer.toHexString((int)readBuffer[2] & 0xFF));
             	if("e1".equals(Integer.toHexString((int)readBuffer[index] & 0xFF))
                     	&& "d2".equals(Integer.toHexString((int)readBuffer[index+1] & 0xFF))){
             		//int c = ((int)readBuffer[2])/8;
@@ -93,7 +94,6 @@ public class Mycom implements SerialPortEventListener{
         				}*/
         			}
         			mc.sendDataToSeriaPort(true);
-        			index += 5;
             		/*for(int i = 0; i < c; i++){
             			int l = readBuffer[3 + i];
             			String str2=Integer.toBinaryString(l);
@@ -108,7 +108,8 @@ public class Mycom implements SerialPortEventListener{
                      	System.out.println("int:" + (int)readBuffer[3 + i] + " HexString:" + Integer.toHexString((int)readBuffer[3 + i] & 0xFF));
                      }
             		mc.sendDataToSeriaPort(true);*/
-            }else{
+            }
+            /*else{
       		    mc.sendDataToSeriaPort(false);
       		    try {
 					Thread.sleep(100);
@@ -116,8 +117,10 @@ public class Mycom implements SerialPortEventListener{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+            }*/
+           index += 5;
             }
-          //  }
+           
         } catch (IOException e) {  
             System.out.println(e.getMessage());  
         } 
@@ -191,7 +194,7 @@ public class Mycom implements SerialPortEventListener{
             return ;  
         }  
           
-        // 设置端口参数  
+        // 设置端口参数   
         try {  
             int rate = 9600;  
             int data = 8;  

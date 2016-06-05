@@ -1,14 +1,15 @@
 package cn.swsn.ui;
 
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -87,7 +88,7 @@ class ActionFrame extends SuperFrame implements Runnable,WindowListener{
 	private JButton jb2 = new JButton("保存");
 	private JLabel jl_info = new JLabel("答题信息：无");
 	private JTextArea jta = new JTextArea(20, 30);
-	Object[][] playerInfo = new Object[250][4];
+	Object[][] playerInfo = new Object[300][4];
 	String[] Names = { "序号", "左端子", "状态", "右端子"};
 	Mycom mc = Mycom.getMC();
 	Thread th = null;
@@ -95,27 +96,29 @@ class ActionFrame extends SuperFrame implements Runnable,WindowListener{
 	ActionFrame() {
 		time = Integer.parseInt(PropertyUtil.getProperty("time")) * 600;
 		this.setTitle("答题测试");
-		this.setSize(400, 500);
+		this.setSize(600, 700);
 		this.remove(jp);
 		this.jp = new JPanel();
 		this.jp.setLayout(null);
-		this.jp.setBounds(0, 0, 400,500);
+		this.jp.setBounds(0, 0, 600,700);
 		this.add(jp);
 		JTable table = new JTable(playerInfo, Names);
 		table.setDefaultRenderer(Object.class, new ColorTableCellRenderer());
 		table.setPreferredScrollableViewportSize(new Dimension(550, 30));
+		table.setFont(new Font("宋体", Font.CENTER_BASELINE, 18));
+		table.setRowHeight(24);
 		JScrollPane scrollPane = new JScrollPane(table);
 		jb1.addMouseListener(this);
 		jb2.addMouseListener(this);
-		jl_name.setBounds(10, 20, 40, 24);
-		jt_name.setBounds(40, 20, 100, 24);
-		jl_no.setBounds(170, 20, 40, 24);
-		jt_no.setBounds(200, 20, 100, 24);
-		jb1.setBounds(320, 20, 60, 24);
-		jb2.setBounds(320, 50, 60, 24);
+		jl_name.setBounds(30, 20, 40, 24);
+		jt_name.setBounds(60, 20, 100, 24);
+		jl_no.setBounds(190, 20, 40, 24);
+		jt_no.setBounds(220, 20, 100, 24);
+		jb1.setBounds(440, 20, 60, 24);
+		jb2.setBounds(440, 50, 60, 24);
 		jb2.setEnabled(false);
-		scrollPane.setBounds(10, 80, 380, 400);
-		jl_info.setBounds(10, 60, 380, 24);
+		scrollPane.setBounds(30, 80, 540, 580);
+		jl_info.setBounds(30, 60, 380, 24);
 		this.jp.prepareImage(null, this);
 		this.jp.add(jl_name);
 		this.jp.add(jt_name);
@@ -193,26 +196,46 @@ class ActionFrame extends SuperFrame implements Runnable,WindowListener{
 		}
 		//int i = 0;
 		int count = 0;
+		int total = 0;
+		int finish = 0;
+		Set fbs = new HashSet();
 		while (time > 0) {
 			try {
 				int tem = time--;
-				String ss = "答题数：" + count + ".  剩余时间:" + tem/600 + "分" + (tem/10)%60 + "秒";
+				String ss ="题目总数：" + total + "已答题数：" + finish + ".  剩余时间:" + tem/600 + "分" + (tem/10)%60 + "秒";
 				jl_info.setText(ss);
-				if(results.size() > 0){
+//				if(results.size() > 0){
 					//for(int j = count; j < results.size(); j++){
-						Object[] obj = { mc.firstBit.get(count), comms[count][1],results.get(count),comms[count][2]};
-						int fb = Integer.parseInt(mc.firstBit.get(count));
-						playerInfo[fb] = obj;
-						count++;
-						if(count >= results.size()){
-							count = 0;
+				
+				if(count >= results.size()-1){
+					System.out.println("count:" + count + "--results" + (results.size()-1));
+					this.repaint();
+					Thread.sleep(100);
+					continue;
+				}
+				
+				String tem_fb = mc.firstBit.get(count);
+				int fb = Integer.parseInt(tem_fb);
+				System.out.println("处理count:" + count + "--fb" + fb);
+				fbs.add(tem_fb);
+				total = fbs.size();	
+				Object[] obj = { tem_fb, comms[fb][1],results.get(count),comms[fb][2]};
+				playerInfo[fb] = obj;
+				finish = 0;
+				if((tem/10)%60%5 == 0){
+					for(Object[] o : playerInfo){
+						if("1".equals(o[2])){
+							finish++;
 						}
+					}
+				}
+				count++;
+//				}
 						/*if(count > 248){
 							count = 0;
 						}*/
 					//}
 					//i = results.size() - 1;
-				}
 				this.repaint();
 				Thread.sleep(100);
 				if(time == 0){
@@ -294,17 +317,20 @@ class ViewFrame extends SuperFrame {
 		this.remove(jp);
 		this.jp = new JPanel();
 		this.jp.setLayout(null);
-		this.jp.setBounds(0, 0, 400,500);
+		this.setSize(600,700);
+		this.jp.setBounds(0, 0, 600,700);
 		this.add(jp);
 		JTable table = new JTable(playerInfo, Names);
 		table.setPreferredScrollableViewportSize(new Dimension(550, 30));
 		table.setDefaultRenderer(Object.class, new ColorTableCellRenderer());
+		table.setFont(new Font("宋体", Font.CENTER_BASELINE, 18));
+		table.setRowHeight(24);
 		JScrollPane scrollPane = new JScrollPane(table);
 		jb1.addMouseListener(this);
 		jl_name.setBounds(10, 20, 40, 24);
 		jt_name.setBounds(40, 20, 100, 24);
 		jb1.setBounds(220, 20, 60, 24);
-		scrollPane.setBounds(10, 80, 380, 400);
+		scrollPane.setBounds(10, 80, 540, 580);
 		jl_info.setBounds(10, 60, 380, 24);
 		this.jp.add(jl_name);
 		this.jp.add(jt_name);
@@ -455,10 +481,13 @@ class CNameFrame extends SuperFrame {
 		this.remove(jp);
 		this.jp = new JPanel();
 		this.jp.setLayout(null);
-		this.jp.setBounds(0, 0, 400,500);
+		this.setSize(600,700);
+		this.jp.setBounds(0, 0, 600,700);
 		this.add(jp);
 		JTable table = new JTable(playerInfo, Names);
 		table.setPreferredScrollableViewportSize(new Dimension(550, 30));
+		table.setFont(new Font("宋体", Font.CENTER_BASELINE, 18));
+		table.setRowHeight(24);
 		//table.setDefaultRenderer(Object.class, new ColorTableCellRenderer());
 		JScrollPane scrollPane = new JScrollPane(table);
 		jb1.addMouseListener(this);
@@ -469,7 +498,7 @@ class CNameFrame extends SuperFrame {
 		jt_size.setBounds(80, 20, 60, 24);
 		jt_size.setText("256");
 		jl_desc.setBounds(20, 50, 180, 24);
-		scrollPane.setBounds(10, 80, 380, 400);
+		scrollPane.setBounds(10, 80, 540, 580);
 		this.jp.add(jb1);
 		this.jp.add(jb);
 		this.jp.add(jl_size);
